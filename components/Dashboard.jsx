@@ -6,7 +6,7 @@ import AddMovieModal from '../components/AddMovieModal';
 import { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://10.4.97.41:3000';
 
 export default function Dashboard() {
   const [movies, setMovies] = useState([]);
@@ -85,9 +85,7 @@ export default function Dashboard() {
         />
       )}
 
-      {selectedSegment === 1 && (
-        <Text style={{ marginTop: 20 }}>Acá va la vista por categoría (Req 4 Parte B)</Text>
-      )}
+      {selectedSegment === 1 && <Text style={{ marginTop: 20 }}></Text>}
 
       <AddMovieFloatingButton
         style={{ position: 'absolute', bottom: 20, right: 20 }}
