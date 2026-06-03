@@ -1,11 +1,14 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { getRatingStars, formatDuration } from '../utils/formatters';
 
-const Movie = ({ title, poster, description }) => {
+const Movie = ({ title, poster, description, rating, duration }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
       <Image source={{ uri: poster }} style={styles.poster} />
       <Text style={styles.description}>{description}</Text>
+      <Text style={styles.rating}>{getRatingStars(rating)}</Text>
+      <Text style={styles.duration}>{formatDuration(duration)}</Text>
     </View>
   );
 };
@@ -32,5 +35,13 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: '#555',
+  },
+  rating: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  duration: {
+    fontSize: 14,
+    color: '#777',
   },
 });

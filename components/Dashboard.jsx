@@ -1,46 +1,103 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet, Text, FlatList, ActivityIndicator } from 'react-native';
 import Movie from '../components/Movie';
-import data from '../data/data.json';
 import AddMovieFloatingButton from '../components/AddMovieFloatingButton';
 import SegmentControl from '../components/SegmentControl';
 import AddMovieModal from '../components/AddMovieModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const API_URL = 'http://localhost:3000';
+
 export default function Dashboard() {
-  const firstMovie = data.movies[0];
+  const [movies, setMovies] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedSegment, setSelectedSegment] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+
+  // traigo las pelis de la API
+  const getMovies = async () => {
+    try {
+      const res = await fetch(`${API_URL}/movies`);
+      const data = await res.json();
+      setMovies(data);
+    } catch (error) {
+      console.log('Error trayendo películas:', error);
+    }
+  };
+
+  // traigo las categorías de la API
+  const getCategories = async () => {
+    try {
+      const res = await fetch(`${API_URL}/categories`);
+      const data = await res.json();
+      setCategories(data);
+    } catch (error) {
+      console.log('Error trayendo categorías:', error);
+    }
+  };
+
+  // cuando arranca la app, cargo todo
+  useEffect(() => {
+    const cargarDatos = async () => {
+      setLoading(true);
+      await getMovies();
+      await getCategories();
+      setLoading(false);
+    };
+    cargarDatos();
+  }, []);
+
+  // mientras carga, muestro un spinner
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Cargando películas...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <SegmentControl
         segments={['All Movies', 'Movies By Category']}
-        selectedSegment={0}
-        onSegmentSelect={(index) => console.log(index)}
+        selectedSegment={selectedSegment}
+        onSegmentSelect={(index) => setSelectedSegment(index)}
         style={{ width: Dimensions.get('window').width - 20 }}
       />
-      <Movie
-        title={firstMovie.title}
-        poster={firstMovie.poster}
-        description={firstMovie.description}
-      />
-      <AddMovieFloatingButton
-        style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 20,
-        }}
-        onPress={() => {
-          console.log('Add Movie Pressed');
 
-          setModalVisible(true);
-        }}
+      {selectedSegment === 0 && (
+        <FlatList
+          style={{ width: '100%' }}
+          data={movies}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Movie
+              title={item.title}
+              poster={item.poster}
+              description={item.description}
+              rating={item.rating}
+              duration={item.duration}
+            />
+          )}
+          contentContainerStyle={{ padding: 10 }}
+        />
+      )}
+
+      {selectedSegment === 1 && (
+        <Text style={{ marginTop: 20 }}>Acá va la vista por categoría (Req 4 Parte B)</Text>
+      )}
+
+      <AddMovieFloatingButton
+        style={{ position: 'absolute', bottom: 20, right: 20 }}
+        onPress={() => setModalVisible(true)}
       />
 
       <AddMovieModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSubmit={() => {
-          // Handle form submission
           console.log('Movie submitted');
         }}
       />
@@ -52,6 +109,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });
