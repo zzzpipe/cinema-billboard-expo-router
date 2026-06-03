@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, FlatList, ActivityIndicator } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, FlatList, ActivityIndicator } from 'react-native';
 import Movie from '../components/Movie';
 import AddMovieFloatingButton from '../components/AddMovieFloatingButton';
 import SegmentControl from '../components/SegmentControl';
@@ -85,8 +85,42 @@ export default function Dashboard() {
         />
       )}
 
-      {selectedSegment === 1 && <Text style={{ marginTop: 20 }}></Text>}
+      {selectedSegment === 1 && (
+        <FlatList
+          style={{ width: '100%' }}
+          data={categories}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item: category }) => {
+            // filtro solo las pelis de esta categoría
+            const pelisDeCategoria = movies.filter((m) => m.category === category.name);
 
+            return (
+              <View style={styles.categorySection}>
+                <Text style={styles.categoryTitle}>{category.name}</Text>
+
+                <FlatList
+                  horizontal
+                  data={pelisDeCategoria}
+                  keyExtractor={(item) => item.id}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={({ item }) => (
+                    <View style={styles.horizontalCard}>
+                      <Movie
+                        title={item.title}
+                        poster={item.poster}
+                        description={item.description}
+                        rating={item.rating}
+                        duration={item.duration}
+                      />
+                    </View>
+                  )}
+                />
+              </View>
+            );
+          }}
+          contentContainerStyle={{ padding: 10 }}
+        />
+      )}
       <AddMovieFloatingButton
         style={{ position: 'absolute', bottom: 20, right: 20 }}
         onPress={() => setModalVisible(true)}
