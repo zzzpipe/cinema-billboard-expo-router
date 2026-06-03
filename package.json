@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "format": "prettier --write .",
-    "server": "json-server --watch data/data.json --port 3000"
+    "server": "json-server --watch data/data.json --port 3000 --host 0.0.0.0"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
